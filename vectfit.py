@@ -58,7 +58,7 @@ def vectfit_step(f, s, poles):
             else:
                 cindex[i] = 2
 
-    # First linear equation to solve. See Appendix A (of what?)
+    # First linear equation to solve. See Appendix A of [1].
     A = np.zeros((Ns, 2*N+2), dtype=np.complex64)
     for i, p in enumerate(poles):
         if cindex[i] == 0:
@@ -175,7 +175,8 @@ def vectfit_auto(f, s, n_poles = 10, n_iter = 10, printparams = False,
     w          = np.imag(s)
     pole_locs  = np.linspace(w[0], w[-1], n_poles+2)[1:-1]
     lr         = loss_ratio
-    init_poles = poles = np.concatenate([[p*(-lr + 1j), p*(-lr - 1j)] for p in pole_locs])
+    poles      = np.concatenate([[p*(-lr + 1j), p*(-lr - 1j)]
+                                 for p in pole_locs])
 
     if inc_real:
         poles = np.concatenate((poles, [1]))
@@ -266,5 +267,4 @@ if __name__ == '__main__':
     ax[1].set_ylabel('Phase [deg]')
     ax[1].set_xlabel('Frequency [Hz]')
     
-    plt.savefig("test_vectfit.pdf", bbox_inches='tight')
-    #plt.show()
+    plt.show()
