@@ -34,7 +34,7 @@ def cc(z):
 def model(s, poles, residues, d, h):
     return sum(r/(s-p) for p, r in zip(poles, residues)) + d + s*h
 
-def vectfit_step(f, s, poles):
+def vectfit_step(f, s, poles, keep_stable):
     """
     f = complex data to fit
     s = j*frequency
@@ -107,8 +107,9 @@ def vectfit_step(f, s, poles):
     H = A - np.outer(b, c)
     H = np.real(H)
     new_poles = np.sort(eigvals(H))
-    unstable  = np.real(new_poles) > 0
-    new_poles[unstable] -= 2*np.real(new_poles)[unstable]
+    if keep_stable:
+        unstable  = np.real(new_poles) > 0
+        new_poles[unstable] -= 2*np.real(new_poles)[unstable]
     return new_poles
 
 # Dear gods of coding style, I sincerely apologize for the following copy/paste
@@ -169,7 +170,8 @@ def print_params(poles, residues, d, h):
     print("offset: {:g}".format(d))
     print("slope: {:g}".format(h))
 
-def vectfit(f, s, poles=None, n_poles = 10, n_iter = 10, 
+def vectfit(f, s, poles=None, n_poles = 10, n_iter = 10,
+            keep_stable = True,
             printparams = False, inc_real = False,
             loss_ratio = 1e-2, rcond = -1, track_poles = False):
 
@@ -187,7 +189,7 @@ def vectfit(f, s, poles=None, n_poles = 10, n_iter = 10,
 
     poles_list = []
     for _ in range(n_iter):
-        poles = vectfit_step(f, s, poles)
+        poles = vectfit_step(f, s, poles, keep_stable)
         poles_list.append(poles)
 
     residues, d, h = calculate_residues(f, s, poles, rcond=rcond)
