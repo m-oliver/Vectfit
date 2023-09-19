@@ -28,9 +28,6 @@ import matplotlib.pyplot as plt
 #from pylab import *
 from numpy.linalg import eigvals, lstsq
 
-
-plt.style.use('BodePlot.mplstyle')
-
 def cc(z):
     return z.conjugate()
 

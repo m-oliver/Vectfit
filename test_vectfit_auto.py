@@ -4,9 +4,6 @@ import scipy.signal as sig
 import matplotlib.pyplot as plt
 from timeit import default_timer as timer
 
-
-plt.style.use('BodePlot.mplstyle')
-
 # Create some test data using known poles and residues
 # Substitute your source of data as needed
 
@@ -59,4 +56,4 @@ ax[1].semilogx(ff, np.angle(err,   deg=True), alpha = 0.3)
 ax[1].set_ylabel('Phase [deg]')
 ax[1].set_xlabel('Frequency [Hz]')
 
-plt.savefig("test_vectfit.pdf", bbox_inches='tight')
+plt.show()
