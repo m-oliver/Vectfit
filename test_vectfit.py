@@ -32,7 +32,7 @@ mytfdata += nzz
 # Run algorithm, results hopefully match the known model parameters
 t_0 = timer()
 
-poles, residues, d, h = vf.vectfit_auto_rescale(mytfdata, s, printparams=False, n_poles=5)
+poles, residues, d, h = vf.vectfit_rescale(mytfdata, s, printparams=False, n_poles=5)
 
 t_elapsed = timer() - t_0
 print('Elapsed time = {t:0.2f} seconds.'.format(t=t_elapsed))

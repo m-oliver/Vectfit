@@ -45,7 +45,7 @@ def vectfit_step(f, s, poles):
     N  = len(poles)
     Ns = len(s)
 
-    cindex = np.zeros(N)
+    cindex = np.zeros(N, dtype=int)
     # cindex is:
     #   - 0 for real poles
     #   - 1 for the first of a complex-conjugate pair
@@ -169,14 +169,18 @@ def print_params(poles, residues, d, h):
     print("offset: {:g}".format(d))
     print("slope: {:g}".format(h))
 
-def vectfit_auto(f, s, n_poles = 10, n_iter = 10, printparams = False,
-                 inc_real = False, loss_ratio = 1e-2, rcond = -1, track_poles = False):
+def vectfit(f, s, poles=None, n_poles = 10, n_iter = 10, 
+            printparams = False, inc_real = False,
+            loss_ratio = 1e-2, rcond = -1, track_poles = False):
 
-    w          = np.imag(s)
-    pole_locs  = np.linspace(w[0], w[-1], n_poles+2)[1:-1]
-    lr         = loss_ratio
-    poles      = np.concatenate([[p*(-lr + 1j), p*(-lr - 1j)]
-                                 for p in pole_locs])
+    if poles == None:
+        w         = np.imag(s)
+        pole_locs = np.linspace(w[0], w[-1], n_poles+2)[1:-1]
+        lr        = loss_ratio
+        poles     = np.concatenate([[p*(-lr + 1j), p*(-lr - 1j)]
+                                     for p in pole_locs])
+    else:
+        n_poles = len(poles)
 
     if inc_real:
         poles = np.concatenate((poles, [1]))
@@ -197,14 +201,14 @@ def vectfit_auto(f, s, n_poles = 10, n_iter = 10, printparams = False,
     return poles, residues, d, h
 
 
-def vectfit_auto_rescale(f, s, printparams=False, **kwargs):
+def vectfit_rescale(f, s, printparams=False, **kwargs):
     s_scale = np.abs(s[-1])
     f_scale = np.abs(f[-1])
 
     if printparams:
         print('SCALED')
         
-    poles_s, residues_s, d_s, h_s = vectfit_auto(f / f_scale, s / s_scale, **kwargs)
+    poles_s, residues_s, d_s, h_s = vectfit(f / f_scale, s / s_scale, **kwargs)
     poles = poles_s * s_scale
     residues = residues_s * f_scale * s_scale
     d = d_s * f_scale
@@ -249,9 +253,9 @@ if __name__ == '__main__':
 
     test_f  = sum(c/(test_s - a) for c, a in zip(test_residues, test_poles))
     test_f += test_d + test_h*test_s
-    vectfit_auto(test_f, test_s)
-
-    poles, residues, d, h = vectfit_auto_rescale(test_f, test_s)
+    
+    poles, residues, d, h = vectfit_rescale(test_f, test_s)
+    #poles, residues, d, h = vectfit(test_f, test_s)
     fitted = model(test_s, poles, residues, d, h)
 
     ff = test_s.imag / 2 / np.pi
